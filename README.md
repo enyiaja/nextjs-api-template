@@ -1,4 +1,73 @@
+
+
+## About the Project
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+### Dependencies (Packages)
+- [Prisma](https://www.prisma.io/)
+
+### Steps to create
+1. First, the following script was entered into the terminal to setup the project
+```bash
+npx create-next-app@latest nextjs-crud-api --typescript
+```
+
+2. Install Prisma dependency
+```bash
+npm install prisma @prisma/client
+npx prisma init --datasource-provider sqlite
+```
+
+3. Setup Prisma models in `prisma/schema.prisma`. Models in prisma represent the tables in your database. 
+- This file would configure the database using the parameters set in the datasource object. 
+- The generator object defines the code that would be generated to query your db. 
+- The model objects define the tables to be created in the db and their Schemas. `Post` has been added as an example
+```prisma
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  createdAt DateTime @default(now())
+}
+```
+
+4. Run scripts:
+```bash
+npx prisma db push
+npx prisma generate
+```
+
+### Folder Structure
+```pgsql
+src/
+├── app/
+│   └── api/
+│       └── posts/
+│           ├── route.ts        ← [POST, GET]
+│           └── [id]/
+│               └── route.ts    ← [GET, PUT, DELETE]
+├── lib/
+│   └── prisma.ts               ← Prisma client
+├── services/
+│   └── postService.ts          ← Business logic
+├── types/
+│   └── post.ts                 ← Types/interfaces
+```
+For every new endpoint you add to the api, ensure that you add:
+- A model to the `prisma/schema.prisma` file defining the database table structure
+- A type/interface to the `types` folder to determine structure
+- A service to the `services` folder containing functions to manipulate the data using prisma
+- The routes to the `app/api` folder to enable the frontend call send data to the endpoint
+
 
 ## Getting Started
 
@@ -6,12 +75,6 @@ First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
