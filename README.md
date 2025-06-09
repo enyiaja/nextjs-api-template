@@ -51,12 +51,18 @@ npx prisma generate
 src/
 ├── app/
 │   └── api/
+|       ├── auth/
+|       |   ├── login/
+|       |   |   └── route.ts
+|       |   └── register/
+|       |       └── route.ts
 │       └── posts/
 │           ├── route.ts        ← [POST, GET]
 │           └── [id]/
 │               └── route.ts    ← [GET, PUT, DELETE]
 ├── lib/
-│   └── prisma.ts               ← Prisma client
+│   ├── prisma.ts               ← Prisma client
+|   └── auth.ts                 ← JWT helpers for auth
 ├── services/
 │   └── postService.ts          ← Business logic
 ├── types/
@@ -67,6 +73,36 @@ For every new endpoint you add to the api, ensure that you add:
 - A type/interface to the `types` folder to determine structure
 - A service to the `services` folder containing functions to manipulate the data using prisma
 - The routes to the `app/api` folder to enable the frontend call send data to the endpoint
+
+### Authentication
+1. Install dependencies (NextAuth, Prisma client and Auth/prisma-adapter)
+```bash
+npm install next-auth @prisma/client @auth/prisma-adapter bcryptjs jsonwebtoken @types/jsonwebtoken
+```
+- `next-auth` → the got-to auth solution for Next.js
+- `bcryptjs` → for securely hashing passwords
+- `jsonwebtoken` → for issuing login tokens
+- `@types/jsonwebtoken` → makes jsonwebtoken import compatible with typescript
+
+2. Ensure User db table schema in `prisma/schema.prisma` is correct and run 
+```bash
+npx prisma db push
+```
+
+3. Create auth utilities in `src/lib/auth.ts` and add functions to 
+- signToken
+- verifyToken
+- requireAuth
+
+4. Define `JWT_SECRET` in `.env` file.
+You can generate a random key by any means of getting a random string or by running the following script
+```bash
+openssl rand -base64 32
+``` 
+
+5. Add routes for `Register` and `Login` and handle requests
+
+6. Call `requireAuth` utility function at the top of every function that requires authentication
 
 
 ## Getting Started
