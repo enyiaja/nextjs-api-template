@@ -4,6 +4,7 @@ import {
   updatePost,
   deletePost,
 } from '@/services/postService';
+import { requireAuth, verifyToken } from '@/lib/auth';
 
 export async function GET(
   req: Request,
@@ -18,6 +19,12 @@ export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
 ) {
+  // Authorise route for only authenticated users
+  const authResult = await requireAuth(req);
+  if (authResult instanceof Response) {
+    return authResult; // Early return if unauthorized
+  }
+
   const body = await req.json();
   const updated = await updatePost(Number(params.id), body);
   return NextResponse.json(updated);
